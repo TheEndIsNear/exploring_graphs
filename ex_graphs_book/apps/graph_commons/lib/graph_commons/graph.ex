@@ -37,4 +37,28 @@ defmodule GraphCommons.Graph do
       uri: "file://" <> graph_path
     }
   end
+
+  defimpl Inspect, for: __MODULE__ do
+    @slice 16
+    @quote <<?">>
+
+    def inspect(%GraphCommons.Graph{} = graph, _opts) do
+      type = graph.type
+      file = @quote <> graph.file <> @quote
+
+      str =
+        graph.data
+        |> String.replace("\n", "\\n")
+        |> String.replace(@quote, "\\" <> @quote)
+        |> String.slice(0, @slice)
+
+      data =
+        case String.length(str) < @slice do
+          true -> @quote <> str <> @quote
+          false -> @quote <> str <> "..." <> @quote
+        end
+
+      "#GraphCommons.Graph<type: #{type}, file: #{file}, data: #{data}>"
+    end
+  end
 end
